@@ -1,48 +1,49 @@
+
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: catalogue
+  name: mysql
   labels:
-    omponent: catalogue
+    component: mysql
     project: roboshop
-    tier: app
+    tier: database
+type: Opaque
 data:
-  MONGO: "true" 
-  MONGO_URL: "mongodb://mongodb:27017/catalogue" 
+  MYSQL_ROOT_PASSWORD: "Um9ib3Nob3BAMQ=="
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: catalogue
+  name: mysql
   namespace: roboshop
   # deployment labels
   labels:
-    component: catalogue
+    component: mysql
     project: roboshop
-    tier: app
+    tier: database
 spec:
   replicas: 2
   # These are the labels replica set use to create pod replicas, this should match pod labels
   selector:
     matchLabels:
-      component: catalogue
+      component: mysql
       project: roboshop
-      tier: app
+      tier: database
   # This is pod definition to create # here metadata name not given 
   template:
     metadata:
       labels:
-        component: catalogue
+        component: mysql
         project: roboshop
-        tier: app
+        tier: database
     spec:
       containers:
-      - name: catalogue
-        image: lvnaren532/catalogue:v1  # it will pull form dcoker hub
+      - name: mysql
+        image: lvnaren532/mysql:v1  # it will pull form dcoker hub
         envFrom:
-        - configMapRef:
-            name: catalogue
-
+        - secretRef:
+            name: mysql
 ---
 
 apiVersion: v1
@@ -51,15 +52,15 @@ metadata:
   name: nginx
   namespace: roboshop
   labels:
-    component: catalogue
+    component: mysql
     project: roboshop
-    tier: app
+    tier: database
 spec:  #so the Service will route traffic to this ,Pod which haveing the same lables
   selector:
-    component: catalogue
+    component: mysql
     project: roboshop
-    tier: app
+    tier: database
   ports:
     - protocol: TCP
-      port: 8080  # service port
-      targetPort: 8080 # container port
+      port: 3306  # service port
+      targetPort: 3306 # container port

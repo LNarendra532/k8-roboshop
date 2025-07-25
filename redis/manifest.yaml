@@ -1,0 +1,50 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: roboshop
+  # deployment labels
+  labels:
+    component: redis
+    project: roboshop
+    tier: database
+spec:
+  replicas: 2
+  # These are the labels replica set use to create pod replicas, this should match pod labels
+  selector:
+    matchLabels:
+      component: redis
+      project: roboshop
+      tier: database
+  # This is pod definition to create # here metadata name not given 
+  template:
+    metadata:
+      labels:
+        component: redis
+        project: roboshop
+        tier: database
+    spec:
+      containers:
+      - name: redis
+        image: redis:7 # it will pull form dcoker hub
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: roboshop
+  labels:
+    component: redis
+    project: roboshop
+    tier: database
+spec:  #so the Service will route traffic to this ,Pod which haveing the same lables
+  selector:
+    component: redis
+    project: roboshop
+    tier: database
+  ports:
+    - protocol: TCP
+      port: 27017  # service port
+      targetPort: 27017 # container port

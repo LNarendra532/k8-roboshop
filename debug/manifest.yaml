@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: pod
+metadata:
+  name: debug
+spec:
+  containers:
+  - name: nginx
+    image: lvnaren532/debug:v1
